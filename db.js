@@ -3,9 +3,6 @@ const connection_string = process.env.DATABASE_URL || `postgres://${process.env.
 console.log(connection_string);
 const pool = new Pool({
     connection_string: connection_string,
-    ssl: {
-        rejectUnauthorized: false
-    }
 });
 
 module.exports = {pool};
