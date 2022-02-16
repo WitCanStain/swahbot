@@ -3,4 +3,3 @@ const connection_string = process.env.DATABASE_URL || `postgres://${process.env.
 const pool = new Pool({connection_string});
 
 module.exports = { pool };
-
