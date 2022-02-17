@@ -3,7 +3,7 @@
 
 const {validateBan, isAdmin} = require("./validator");
 const {formatDistance} = require("date-fns");
-const {pool} = require("./db");
+const {client} = require("./db");
 
 async function banHandler(message, params) {
     let ban = {
@@ -83,7 +83,7 @@ const unbanHandler = async function(message, params) {
         } else {
             message.reply(`Could not unban user :(`)
         }
-        await pool.query(
+        await client.query(
             "DELETE FROM bans WHERE user_id = $1",
             [user_id]
         );
@@ -97,7 +97,7 @@ const unbanHandler = async function(message, params) {
 
 const unbanUser = async function(user_id) {
     try {
-        await pool.query(
+        await client.query(
             "DELETE FROM bans WHERE user_id = $1",
             [user_id]
         );
@@ -111,12 +111,12 @@ const unbanUser = async function(user_id) {
 const banUser = async function(ban, previous_ban) {
     try {
         if (previous_ban) {
-            await pool.query(
+            await client.query(
                 "UPDATE bans SET duration = $1, reason = $2 WHERE id = $3",
                 [ban.duration, ban.reason, previous_ban.id]
             );
         } else {
-            await pool.query(
+            await client.query(
                 "INSERT INTO bans (user_id, duration, banner_id, reason, created, user_name, banner_name) VALUES ($1, $2, $3, $4, $5, $6, $7)",
                 [ban.user_id, ban.duration, ban.banner_id, ban.reason, Date.now(), ban.user_name, ban.banner_name]
             );
@@ -130,7 +130,7 @@ const banUser = async function(ban, previous_ban) {
 }
 
 const isBanned = async function(user_id) {
-    const res = await pool.query(
+    const res = await client.query(
         "SELECT * FROM bans WHERE user_id=($1)",
         [user_id]
     );

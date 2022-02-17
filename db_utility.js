@@ -1,8 +1,8 @@
-const {pool} = require("./db");
+const {client} = require("./db");
 
 
 const getAuctionFromChannelId = async function(channel_id) {
-    let auction = await pool.query(
+    let auction = await client.query(
         "SELECT * FROM auctions WHERE channel_id = $1 AND deleted=false",
         [channel_id]
     );

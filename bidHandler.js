@@ -1,5 +1,5 @@
 const {validateBid} = require("./validator");
-const {pool} = require("./db");
+const {client} = require("./db");
 
 
 const bidHandler = async function (message, params) {
@@ -31,12 +31,12 @@ const bidHandler = async function (message, params) {
 const createBid = async function(bid) {
     console.log(`Entered createBid()`)
     try {
-        let res = await pool.query(
+        let res = await client.query(
             "INSERT INTO bids (user_id, amount, created, user_name, auction_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
             [bid.user_id, bid.amount, Date.now(), bid.user_name, bid.auction_id]
         );
         let bid_id = res.rows[0].id;
-        await pool.query(
+        await client.query(
             "UPDATE auctions SET high_bid = $1, bids = array_append(bids, $2) WHERE channel_id = $3",
             [bid_id, bid.user_id, bid.auction_id]
         );

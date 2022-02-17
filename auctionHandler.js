@@ -1,4 +1,4 @@
-const {pool} = require("./db");
+const {client} = require("./db");
 const {isAdmin, isBanned} = require("./validator");
 
 const {validateAuction} = require("./validator");
@@ -75,7 +75,7 @@ const ahHandler = async function(message, params) {
 
 const createAuction = async function(auction) {
     let current_time = Date.now()
-    const res = await pool.query(
+    const res = await client.query(
         "INSERT INTO auctions (channel_id, admin_id, auctioner_id, ticket_id, duration, initial_bid, item, created, minimum_bid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
         [auction.channel_id, auction.admin_id, auction.auctioner_id, auction.ticket_number, auction.duration, auction.initial_bid, auction.item, current_time, auction.minimum_bid]
     );

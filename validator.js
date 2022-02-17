@@ -1,4 +1,4 @@
-const {pool} = require("./db");
+const {client} = require("./db");
 const {getAuctionFromChannelId} = require("./db_utility");
 
 
@@ -43,7 +43,7 @@ const isAdmin = function(message) {
 
 const isBanned = async function(user_id) {
     try {
-        let res = await pool.query(
+        let res = await client.query(
             "SELECT user_name FROM bans WHERE user_id = $1 AND deleted=false",
             [user_id]
         );
@@ -69,7 +69,7 @@ const validateBid = async function(bid, message) {
             return false;
         }
         console.log(`auction: ${JSON.stringify(auction)}`);
-        let high_bid_query = (await pool.query(
+        let high_bid_query = (await client.query(
             "SELECT amount FROM bids WHERE id = $1 AND deleted = false",
             [auction.high_bid]
         ));
