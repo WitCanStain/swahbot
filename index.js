@@ -1,26 +1,25 @@
-const dotenv = require('dotenv')
-dotenv.config()
-const {formatDistance} = require('date-fns');
-const { Client, Intents } = require('discord.js');
-const {inspect} = require('util')
+const dotenv = require('dotenv');
+dotenv.config();
+const {inspect} = require('util');
 const {banHandler, unbanHandler} = require('./banHandler');
-const {ahHandler} = require("./auctionHandler");
+const {ahHandler, cancelAuction, completeAuction, auctionPopulator} = require("./auctionHandler");
 const {bidHandler} = require("./bidHandler");
 const {moveHandler} = require("./moveHandler");
-// Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const {ds_client} = require("./ds");
+const {watchAuction, unwatchAuction} = require("./watchHandler");
+const {isBanned} = require("./validator");
 
-// When the client is ready, run this code (only once)
-client.once('ready', () => {
-    console.log('Ready!');
-});
+const PREFIX = '!';
 
-const PREFIX = '!'
-
-
-client.on("messageCreate", async message => {
+ds_client.on("messageCreate", async message => {
 
     if (message.author.bot || !message.content.startsWith(PREFIX)) {
+        return;
+    }
+
+    if (await isBanned(message.author.id)) {
+        console.log(`Player is banned.`)
+        await message.reply(`OwOpsie woopsie, yoUwU are banned!`);
         return;
     }
 
@@ -28,13 +27,27 @@ client.on("messageCreate", async message => {
     const commandBody = message.content.slice(PREFIX.length);
     const params = commandBody.match(regx);
     const command = params.shift().toLowerCase();
-
     switch (command) {
         case 'bid':
-            await bidHandler(message, params)
+            await bidHandler(message, params);
+            break;
+        case 'watch':
+            await watchAuction(message, params);
+            break;
+        case 'unwatch':
+            await unwatchAuction(message, params);
             break;
         case 'ahcreate':
             await ahHandler(message, params);
+            break;
+        case 'ah':
+            await auctionPopulator(message, params);
+            break;
+        case 'ahcancel':
+            await cancelAuction(message.channelId);
+            break;
+        case 'ahclose':
+            completeAuction(message.channelId);
             break;
         case 'ahban':
             await banHandler(message, params);
@@ -51,9 +64,5 @@ client.on("messageCreate", async message => {
 });
 
 // Login to Discord with your client's token
-client.login(process.env.BOT_TOKEN);
-
-
-
 
 

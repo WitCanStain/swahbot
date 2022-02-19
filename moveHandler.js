@@ -1,8 +1,10 @@
 const {isAdmin} = require("./validator");
-const {getRoleByName} = require("./db_utility");
+const {getRoleByName} = require("./ds_utils");
+const {getActiveAuctionByChannelId, setAdminForAuctionByChannelId} = require("./db_utils");
 
 
 const moveHandler = async function(message, params) {
+    console.log(`Entered moveHandler().`);
     try {
         if (!isAdmin(message)) {
             message.reply(`Only an admeme can perform this action.`);
@@ -24,6 +26,8 @@ const moveHandler = async function(message, params) {
         if (category && channel) {
             await channel.setParent(category.id);
             await channel.lockPermissions();
+            await setAdminForAuctionByChannelId(message.author.id, channel_id);
+
             if (ping) {
                 let role = await getRoleByName(message, category_name);
                 channel.send(`<@&${role.id}>: A new auction has opened.`);

@@ -3,68 +3,75 @@
 
 const {validateBan, isAdmin} = require("./validator");
 const {formatDistance} = require("date-fns");
-const {client} = require("./db");
+const {pool} = require("./db");
 
 async function banHandler(message, params) {
-    let ban = {
-        user_id: null,
-        user_name: null,
-        duration: null,
-        reason: null,
-        banner_id: message.author.id,
-        banner_name: message.author.username
-    }
-    let previous_ban;
+    console.log(`Entered banHandler().`);
+    try {
+        let ban = {
+            user_id: null,
+            user_name: null,
+            duration: null,
+            reason: null,
+            banner_id: message.author.id,
+            banner_name: message.author.username
+        }
+        let previous_ban;
 
-    if (message.mentions.members.first()) {
-        ban.user_id = message.mentions.members.first().user.id;
-        ban.user_name = message.mentions.members.first().user.username;
-    } else {
-        console.log("No user provided, aborting...");
-        return false;
-    }
-
-    for (const param of params) {
-        let param_parts = param.split('=');
-        let param_name = param_parts[0].toLowerCase();
-        let param_value = param_parts[1];
-        switch (param_name) {
-            case 'duration':
-                ban.duration = parseInt(param_value) * process.env.DAY_MSECONDS;
-                console.log(`ban duration: ${ban.duration}`)
-                previous_ban = await isBanned(ban.user_id);
-                if (previous_ban) {
-                    previous_ban.created = parseInt(previous_ban.created);
-                    previous_ban.duration = parseInt(previous_ban.duration);
-                    ban.duration = ban.duration + previous_ban.duration;
-                }
-                break;
-            case 'reason':
-                ban.reason = param_value;
-                break;
-            default:
-                break;
-
+        if (message.mentions.members.first()) {
+            ban.user_id = message.mentions.members.first().user.id;
+            ban.user_name = message.mentions.members.first().user.username;
+        } else {
+            console.log("No user provided, aborting...");
+            return false;
         }
 
-    }
-    if (validateBan(ban)) {
-        let success = await banUser(ban, previous_ban);
-        if (success) {
-            console.log(`Ban: ${JSON.stringify(ban)}`);
-            if (previous_ban) {
-                message.reply(`User ${ban.user_name} was already banned for ${formatDistance( previous_ban.created + previous_ban.duration, Date.now())}. The ban has been extended to ${formatDistance(parseInt( Date.now() + ban.duration), Date.now())}.`)
-            } else {
-                message.reply(`User ${ban.user_name} has been banned for ${formatDistance( Date.now() + ban.duration, Date.now())}.`)
+        for (const param of params) {
+            let param_parts = param.split('=');
+            let param_name = param_parts[0].toLowerCase();
+            let param_value = param_parts[1];
+            switch (param_name) {
+                case 'duration':
+                    ban.duration = parseInt(param_value) * process.env.DAY_MSECONDS;
+                    console.log(`ban duration: ${ban.duration}`)
+                    previous_ban = await isBanned(ban.user_id);
+                    if (previous_ban) {
+                        previous_ban.created = parseInt(previous_ban.created);
+                        previous_ban.duration = parseInt(previous_ban.duration);
+                        ban.duration = ban.duration + previous_ban.duration;
+                    }
+                    break;
+                case 'reason':
+                    ban.reason = param_value;
+                    break;
+                default:
+                    break;
+
             }
 
         }
-    } else {
+        if (validateBan(ban)) {
+            let success = await banUser(ban, previous_ban);
+            if (success) {
+                console.log(`Ban: ${JSON.stringify(ban)}`);
+                if (previous_ban) {
+                    message.reply(`User ${ban.user_name} was already banned for ${formatDistance( previous_ban.created + previous_ban.duration, Date.now())}. The ban has been extended to ${formatDistance(parseInt( Date.now() + ban.duration), Date.now())}.`)
+                } else {
+                    message.reply(`User ${ban.user_name} has been banned for ${formatDistance( Date.now() + ban.duration, Date.now())}.`)
+                }
+
+            }
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error(e);
         return false;
     }
 }
 
 const unbanHandler = async function(message, params) {
+    console.log(`Entered unbanHandler().`);
     try {
         if (!isAdmin(message)) {
             message.reply(`Only an admeme can perform this action.`);

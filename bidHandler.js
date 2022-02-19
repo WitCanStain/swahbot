@@ -1,12 +1,24 @@
-const {validateBid} = require("./validator");
-const {client} = require("./db");
+const {validateBid, parseBid} = require("./validator");
+const {pool} = require("./db");
+const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid} = require("./db_utils");
+const {closeAuction} = require("./auctionHandler");
+const {sendToUser, sendToChannel} = require("./ds_utils");
 
 
 const bidHandler = async function (message, params) {
+    console.log(`Entered bidHandler().`);
     try {
         if (params.length != 1) {
             console.log("Improper number of parameters.");
             return false;
+        }
+        let auction = await getActiveAuctionByChannelId(message.channelId);
+        if (params[0].toLowerCase() === 'bin') {
+            if (!auction.bin) {
+                message.reply(`This auction does not have a BIN price.`);
+            } else {
+                params[0] = auction.bin;
+            }
         }
         let bid = {
             user_id: message.author.id,
@@ -14,11 +26,31 @@ const bidHandler = async function (message, params) {
             user_name: message.author.username,
             auction_id: message.channelId
         }
-        console.log(`bid object: ${JSON.stringify(bid)}`)
-        if (await validateBid(bid, message)) {
+        if (await validateBid(bid, message, auction)) {
             console.log(`Bid: ${JSON.stringify(bid)}`);
-            await createBid(bid);
-            message.reply(`<@${message.author.id}> has the new high bid at ${bid.amount}.`)
+            let res = await createBid(bid);
+            if (!res) {
+                await sendToChannel(`Something went wrong x.x`);
+                return;
+            }
+            let watchers = await getAuctionWatchersFromAuctionId(auction.id);
+            console.log(`auction::: ${JSON.stringify(auction)},,,,, ${bid.amount}`);
+            if (auction.bin && bid.amount >= parseInt(auction.bin)) {
+                await sendToChannel(auction.channel_id, `<@${message.author.id}> has bid the BIN price and wins the auction.`);
+                await closeAuction(auction.id);
+                watchers.forEach((watcher) => {
+                    if (!(watcher === bid.user_id)) {
+                        sendToUser(watcher, `Hey, I'm afraid somebody has bid the BIN price and won the auction for ${auction.item} in <#${auction.channel_id}> in the Stoneworks Auction House that you also bid in. Better luck next time.`);
+                    }
+                })
+            } else {
+                message.reply(`<@${message.author.id}> has the new high bid at ${bid.amount}.`);
+                watchers.forEach((watcher) => {
+                    if (!(watcher === bid.user_id)) {
+                        sendToUser(watcher, `Hey, just letting you know that somebody outbid you in the Stoneworks Auction House for ${auction.item} in <#${auction.channel_id}>. New high bid is ${bid.amount}.`);
+                    }
+                })
+            }
             return true;
         }
     } catch (e) {
@@ -28,49 +60,9 @@ const bidHandler = async function (message, params) {
 
 }
 
-const createBid = async function(bid) {
-    console.log(`Entered createBid()`)
-    try {
-        let res = await client.query(
-            "INSERT INTO bids (user_id, amount, created, user_name, auction_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-            [bid.user_id, bid.amount, Date.now(), bid.user_name, bid.auction_id]
-        );
-        let bid_id = res.rows[0].id;
-        await client.query(
-            "UPDATE auctions SET high_bid = $1, bids = array_append(bids, $2) WHERE channel_id = $3",
-            [bid_id, bid.user_id, bid.auction_id]
-        );
-        return true;
-    } catch (e) {
-        console.error(e);
-        return false;
-    }
-}
 
-const parseBid = function(bid) {
-    try {
-        let modifier = bid.slice(-1);
-        if (modifier === 'k' || modifier === 'm') {
-            bid = bid.replaceAll(modifier, '');
-            bid = parseFloat(bid);
-            if (modifier === 'k') {
-                bid = bid * 1000;
-            } else {
-                bid = bid * 1000000
-            }
-            bid = parseInt(bid);
 
-        }
-        if (!isNaN(bid)) {
-            return bid;
-        } else {
-            return false;
-        }
-    } catch (e) {
-        console.error(e);
-    }
 
-}
 
 exports.bidHandler = bidHandler;
 exports.parseBid = parseBid;
