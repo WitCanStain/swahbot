@@ -17,6 +17,11 @@ ds_client.on("messageCreate", async message => {
         return;
     }
 
+    let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === "text channels" && c.type === "GUILD_CATEGORY");
+    if (category) {
+        return;
+    }
+
     if (await isBanned(message.author.id)) {
         console.log(`Player is banned.`)
         await message.reply(`OwOpsie woopsie, yoUwU are banned!`);
