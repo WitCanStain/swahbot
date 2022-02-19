@@ -17,7 +17,8 @@ ds_client.on("messageCreate", async message => {
         return;
     }
 
-    let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === "text channels" && c.type === "GUILD_CATEGORY");
+    let parent_id = message.channel.parent_id;
+    let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === "text channels" && c.id === parent_id && c.type === "GUILD_CATEGORY");
     if (category) {
         return;
     }
