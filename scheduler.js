@@ -14,11 +14,9 @@ const {ds_client} = require("./ds");
  */
 const scheduler = function() {
     try {
-        console.log(pool.totalCount)
         ds_client.once('ready', () => {
             auctionCheck().then(() => {
                 console.log(`done`)
-                console.log(pool.totalCount)
                 pool.end();
                 ds_client.destroy();
                 console.log(`Scheduler run, exiting...`);
