@@ -58,10 +58,16 @@ ds_client.on("messageCreate", async message => {
         case 'ahmove':
             await moveHandler(message, params);
             break;
+        case 'credits':
+            await credits(message);
         default:
             break;
     }
 });
+
+const credits = function(message) {
+    message.reply(`This Stoneworks Auction House bot was created by Wittgenstein, who is very handsome and cool.`);
+}
 
 // Login to Discord with your client's token
 
