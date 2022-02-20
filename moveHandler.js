@@ -25,6 +25,7 @@ const moveHandler = async function(message, params) {
         let channel = server.channels.cache.find(c => c.id === channel_id && c.type === "GUILD_TEXT");
         if (category && channel) {
             await channel.setParent(category.id);
+            await channel.setPosition(0);
             await channel.lockPermissions();
             await setAdminForAuctionByChannelId(message.author.id, channel_id);
 
