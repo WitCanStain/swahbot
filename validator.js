@@ -80,6 +80,10 @@ const validateBid = async function(bid, message, auction) {
             message.reply(`Improper bid amount. Bids must be positive integers.`);
             return false;
         }
+        if (bid.user_id === auction.auctioner_id) {
+            message.reply(`You cannot bid on your own auctions.`);
+            return false;
+        }
         // let auction = await getAuctionByChannelId(bid.auction_id);
         if (!auction) {
             message.reply(`Auction not found. Check that there is an active auction in this channel.`);
