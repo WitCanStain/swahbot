@@ -32,6 +32,9 @@ const moveHandler = async function(message, params) {
                 const role_name = getRoleNameFromCategoryName(category_name);
                 if (role_name) {
                     let role = await getRoleByName(message, role_name);
+                    let auction = await getActiveAuctionByChannelId(channel_id);
+                    await message.channel.setName(`${auction.item}-${auction.id}`)
+                        .catch(console.error);
                     channel.send(`<@&${role.id}>: A new auction has opened.`);
                 }
             }
