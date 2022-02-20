@@ -129,6 +129,9 @@ const auctionPopulator = async function(message, params) {
                 if (isNaN(duration) || parseInt(duration) <= 0) {
                     message.reply(`Number of days must be a positive integer!`);
                     return;
+                } else if (parseInt(duration) > 7) {
+                    message.reply(`Maximum duration for an auction is 7 days.`);
+                    return;
                 } else {
                     await populateAuctionField(channel_id, 'duration', parseInt(duration));
                     message.reply(`Ok, the duration is ${duration} days. What is the starting bid? Type \`!ah [starting bid]\`. For example, \`5000\`, \`5k\`, and \`0.005m\` are acceptable values and mean the same thing.`);
