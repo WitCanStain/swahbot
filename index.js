@@ -7,13 +7,17 @@ const {bidHandler} = require("./bidHandler");
 const {moveHandler} = require("./moveHandler");
 const {ds_client} = require("./ds");
 const {watchAuction, unwatchAuction} = require("./watchHandler");
-const {isBanned} = require("./validator");
+const {isBanned, isAdmin} = require("./validator");
 
 const PREFIX = '!';
 
 ds_client.on("messageCreate", async message => {
 
     if (message.author.bot || !message.content.startsWith(PREFIX)) {
+        return;
+    }
+
+    if (!isAdmin(message)) {
         return;
     }
 
