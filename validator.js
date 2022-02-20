@@ -50,7 +50,7 @@ const validateAuction = function(message, auction) {
 
 const isAdmin = function(message) {
     try {
-        return message.member.roles.cache.some(r => r.name.toLowerCase() === "admeme" || r.name.toLowerCase() === "senor admeme");
+        return message.member.roles.cache.some(r => r.name.toLowerCase() === "admeme" || r.name.toLowerCase() === "senor admeme" || r.name.toLowerCase() === "the mrflipkin");
     } catch (e) {
         console.error(e);
         return false;
