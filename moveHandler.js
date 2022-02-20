@@ -29,7 +29,8 @@ const moveHandler = async function(message, params) {
             await setAdminForAuctionByChannelId(message.author.id, channel_id);
 
             if (ping) {
-                let role = await getRoleByName(message, category_name);
+                const role_name = getRoleNameFromCategoryName(category_name);
+                let role = await getRoleByName(message, role_name);
                 channel.send(`<@&${role.id}>: A new auction has opened.`);
             }
 
@@ -41,6 +42,40 @@ const moveHandler = async function(message, params) {
         console.error(e);
         return false;
     }
+}
+
+const getRoleNameFromCategoryName = function(category_name) {
+    let role_name;
+    switch (category_name) {
+        case 'partner auctions':
+            role_name = 'rare items';
+            break;
+        case 'auction of the month':
+            role_name = 'aotm';
+            break;
+        case 'vanity items':
+            role_name = 'vanity';
+            break;
+        case 'rare items':
+        case 'services':
+        case 'mobs and spawn eggs':
+        case 'written books':
+        case 'minerals':
+        case 'armor':
+        case 'weapons':
+        case 'tools':
+        case 'blocks':
+        case 'enchanted books':
+        case 'brews and brew recipes':
+        case 'potions and foodstuffs':
+        case 'miscellaneous':
+            role_name = category_name;
+            break;
+        default:
+            role_name = null;
+            break;
+    }
+    return role_name;
 }
 
 exports.moveHandler = moveHandler;
