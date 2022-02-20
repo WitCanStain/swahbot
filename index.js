@@ -17,9 +17,13 @@ ds_client.on("messageCreate", async message => {
         return;
     }
 
-    let parent_id = message.channel.parent_id;
-    let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === "text channels" && c.id === parent_id && c.type === "GUILD_CATEGORY");
-    if (category) {
+    let parent = message.channel.parent;
+    let parent_name;
+    if (parent) {
+        parent_name = parent.name;
+        console.log(`parent: ${parent_name}`);
+    }
+    if (parent_name.toLowerCase() === 'text channels') {
         return;
     }
 
