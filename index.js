@@ -17,10 +17,6 @@ ds_client.on("messageCreate", async message => {
         return;
     }
 
-    if (!isAdmin(message)) {
-        return;
-    }
-
     let parent_id = message.channel.parent_id;
     let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === "text channels" && c.id === parent_id && c.type === "GUILD_CATEGORY");
     if (category) {
