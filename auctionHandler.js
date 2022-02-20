@@ -189,7 +189,7 @@ const auctionPopulator = async function(message, params) {
                 await populateAuctionField(channel_id, 'ign', ign);
                 await setAuctionToActiveByChannelId(channel_id);
                 let bin_string = parseInt(auction.bin) ? `\nBIN: ${auction.bin}`: '';
-                await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.`)
+                await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.\nYou may now start bidding by doing \`!bid [amount]\`, or BIN by doing \`!bid bin\`.`)
                 break;
         }
         return true;
