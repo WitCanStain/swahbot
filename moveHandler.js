@@ -30,8 +30,10 @@ const moveHandler = async function(message, params) {
 
             if (ping) {
                 const role_name = getRoleNameFromCategoryName(category_name);
-                let role = await getRoleByName(message, role_name);
-                channel.send(`<@&${role.id}>: A new auction has opened.`);
+                if (role_name) {
+                    let role = await getRoleByName(message, role_name);
+                    channel.send(`<@&${role.id}>: A new auction has opened.`);
+                }
             }
 
         } else {
