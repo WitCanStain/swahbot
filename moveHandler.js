@@ -33,7 +33,7 @@ const moveHandler = async function(message, params) {
                 if (role_name) {
                     let role = await getRoleByName(message, role_name);
                     let auction = await getActiveAuctionByChannelId(channel_id);
-                    await message.channel.setName(`${auction.item}-${auction.id}`)
+                    await message.channel.setName(`${auction.item}-${channel.name.slice(-4)}`)
                         .catch(console.error);
                     channel.send(`<@&${role.id}>: A new auction has opened.`);
                 }
