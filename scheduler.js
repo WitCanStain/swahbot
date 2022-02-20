@@ -47,7 +47,7 @@ const auctionCheck = async function() {
     const active_auctions = res.rows;
     console.log(active_auctions)
     for (const auction of active_auctions) {
-        let end_time = parseInt(auction.created) + parseInt(auction.duration);
+        let end_time = parseInt(auction.created) + parseInt(auction.duration) * parseInt(process.env.DAY_MSECONDS);
         console.log(`end_time: ${end_time}`);
         if (end_time < Date.now()) {
             console.log(`Auction has ended, closing auction.`);
