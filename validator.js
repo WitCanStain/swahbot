@@ -116,7 +116,7 @@ const validateBid = async function(bid, message, auction) {
 
 const parseBid = function(bid) {
     try {
-        let modifier = bid.slice(-1);
+        let modifier = bid.slice(-1).toLowerCase();
 
         if (modifier === 'k' || modifier === 'm') {
             bid = bid.replaceAll(modifier, '');

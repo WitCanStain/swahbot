@@ -54,10 +54,10 @@ ds_client.on("messageCreate", async message => {
             await auctionPopulator(message, params);
             break;
         case 'ahcancel':
-            await cancelAuction(message.channelId);
+            await cancelAuction(message);
             break;
         case 'ahclose':
-            completeAuction(message.channelId);
+            completeAuction(message);
             break;
         case 'ahban':
             await banHandler(message, params);

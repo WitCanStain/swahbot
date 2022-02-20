@@ -219,9 +219,13 @@ const closeAuction = async function(auction_id) {
 
 }
 
-const completeAuction = async function(channel_id) {
+const completeAuction = async function(message) {
     console.log(`Entered completeAuction().`)
     try {
+        if (!isAdmin(message)) {
+            return false;
+        }
+        let channel_id = message.channelId;
         let auction = await getUnfinalisedAuctionByChannelId(channel_id);
         if (!auction) {
             await sendToChannel(channel_id, `Could not find an active auction in this channel.`);
@@ -236,9 +240,13 @@ const completeAuction = async function(channel_id) {
     }
 }
 
-const cancelAuction = async function(channel_id) {
+const cancelAuction = async function(message) {
     console.log(`Entered cancelAuction().`);
     try {
+        if (!isAdmin(message)) {
+            return false;
+        }
+        let channel_id = message.ChannelId;
         let auction = await getActiveAuctionByChannelId(channel_id);
         if (!auction) {
             await sendToChannel(channel_id, `There is no active auction in this channel.`);
