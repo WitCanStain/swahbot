@@ -16,6 +16,7 @@ const bidHandler = async function (message, params) {
         if (params[0].toLowerCase() === 'bin') {
             if (!auction.bin) {
                 message.reply(`This auction does not have a BIN price.`);
+                return;
             } else {
                 params[0] = auction.bin;
             }

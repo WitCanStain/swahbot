@@ -252,6 +252,7 @@ const cancelAuction = async function(message) {
     console.log(`Entered cancelAuction().`);
     try {
         if (!isAdmin(message)) {
+            message.reply(`Only an admeme can perform this action.`)
             return false;
         }
         let channel_id = message.channelId;
