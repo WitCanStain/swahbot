@@ -114,6 +114,10 @@ const auctionPopulator = async function(message, params) {
         }
         let last_field = auction.last_filled_field;
         let channel_id = auction.channel_id;
+        if (last_field !== '$ahstart' && params.length > 1) {
+            message.reply(`Please ensure that there are not spaces in your answer.`);
+            return;
+        }
         switch (last_field) {
             case '$ahstart':
                 let item = params.join(' ');
@@ -173,6 +177,10 @@ const auctionPopulator = async function(message, params) {
                 message.reply(`Ok, the minimum bid is ${minimum_bid}. Finally, what is your In-Game Name? Type \`!ah [name]\`.`);
                 break;
             case 'minimum_bid':
+                if (params.length > 1) {
+                    message.reply(`That is not a valid In-Game Name...`);
+                    return;
+                }
                 let ign = params[0];
                 if (!ign) {
                     message.reply(`You must provide an IGN! Try again.`);

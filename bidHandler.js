@@ -34,7 +34,7 @@ const bidHandler = async function (message, params) {
                 return;
             }
             let watchers = await getAuctionWatchersFromAuctionId(auction.id);
-            console.log(`auction::: ${JSON.stringify(auction)},,,,, ${bid.amount}`);
+            console.log(`auction: ${JSON.stringify(auction)}, ${bid.amount}`);
             if (auction.bin && bid.amount >= parseInt(auction.bin)) {
                 await sendToChannel(auction.channel_id, `<@${message.author.id}> has bid the BIN price and wins the auction.`);
                 await closeAuction(auction.id);
