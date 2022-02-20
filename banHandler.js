@@ -90,7 +90,7 @@ const unbanHandler = async function(message, params) {
         } else {
             message.reply(`Could not unban user :(`)
         }
-        await client.query(
+        await pool.query(
             "DELETE FROM bans WHERE user_id = $1",
             [user_id]
         );
@@ -104,7 +104,7 @@ const unbanHandler = async function(message, params) {
 
 const unbanUser = async function(user_id) {
     try {
-        await client.query(
+        await pool.query(
             "DELETE FROM bans WHERE user_id = $1",
             [user_id]
         );
@@ -118,12 +118,12 @@ const unbanUser = async function(user_id) {
 const banUser = async function(ban, previous_ban) {
     try {
         if (previous_ban) {
-            await client.query(
+            await pool.query(
                 "UPDATE bans SET duration = $1, reason = $2 WHERE id = $3",
                 [ban.duration, ban.reason, previous_ban.id]
             );
         } else {
-            await client.query(
+            await pool.query(
                 "INSERT INTO bans (user_id, duration, banner_id, reason, created, user_name, banner_name) VALUES ($1, $2, $3, $4, $5, $6, $7)",
                 [ban.user_id, ban.duration, ban.banner_id, ban.reason, Date.now(), ban.user_name, ban.banner_name]
             );
@@ -137,7 +137,7 @@ const banUser = async function(ban, previous_ban) {
 }
 
 const isBanned = async function(user_id) {
-    const res = await client.query(
+    const res = await pool.query(
         "SELECT * FROM bans WHERE user_id=($1)",
         [user_id]
     );
