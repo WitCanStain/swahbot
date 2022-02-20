@@ -246,7 +246,7 @@ const cancelAuction = async function(message) {
         if (!isAdmin(message)) {
             return false;
         }
-        let channel_id = message.ChannelId;
+        let channel_id = message.channelId;
         let auction = await getActiveAuctionByChannelId(channel_id);
         if (!auction) {
             await sendToChannel(channel_id, `There is no active auction in this channel.`);
