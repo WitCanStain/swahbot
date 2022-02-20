@@ -61,6 +61,9 @@ const getRoleNameFromCategoryName = function(category_name) {
         case 'vanity items':
             role_name = 'vanity';
             break;
+        case 'management':
+            role_name = 'admemes';
+            break;
         case 'rare items':
         case 'services':
         case 'mobs and spawn eggs':
