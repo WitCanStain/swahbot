@@ -13,7 +13,7 @@ const moveHandler = async function(message, params) {
         let server = message.guild;
         let category_name;
         let ping = params.at(-1);
-        if (ping === 'PING') {
+        if (ping.toLowerCase() === 'PING') {
             ping = true;
             category_name = params.slice(0, -1).join(' ').toLowerCase();
         } else {
