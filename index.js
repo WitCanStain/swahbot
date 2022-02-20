@@ -23,9 +23,12 @@ ds_client.on("messageCreate", async message => {
         parent_name = parent.name;
         console.log(`parent: ${parent_name}`);
     }
-    if (parent_name.toLowerCase() === 'text channels') {
-        return;
+    if (parent_name) {
+        if (parent_name.toLowerCase() === 'text channels') {
+            return;
+        }
     }
+
 
     if (await isBanned(message.author.id)) {
         console.log(`Player is banned.`)
