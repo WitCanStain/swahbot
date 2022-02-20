@@ -1,6 +1,6 @@
 const {validateBid, parseBid} = require("./validator");
 const {pool} = require("./db");
-const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid} = require("./db_utils");
+const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, getBidById} = require("./db_utils");
 const {closeAuction} = require("./auctionHandler");
 const {sendToUser, sendToChannel} = require("./ds_utils");
 
@@ -61,9 +61,32 @@ const bidHandler = async function (message, params) {
 
 }
 
+const topBid = async function(message) {
+    console.log(`Entered topBid().`);
+    try {
+        let auction = await getActiveAuctionByChannelId(message.channelId);
+        if (!auction) {
+            message.reply(`There is no active auction in this channel.`);
+            return;
+        }
+        let bid = await getBidById(auction.high_bid);
+        if (auction.bin) {
+            message.reply(`Current top bid is ${bid.amount}. The BIN is ${auction.bin}.`);
+        } else {
+            message.reply(`Current top bid is ${bid.amount}. There is no BIN.`);
+        }
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+
+}
+
 
 
 
 
 exports.bidHandler = bidHandler;
 exports.parseBid = parseBid;
+exports.topBid = topBid;

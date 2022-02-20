@@ -3,7 +3,7 @@ dotenv.config();
 const {inspect} = require('util');
 const {banHandler, unbanHandler} = require('./banHandler');
 const {ahHandler, cancelAuction, completeAuction, auctionPopulator} = require("./auctionHandler");
-const {bidHandler} = require("./bidHandler");
+const {bidHandler, topBid} = require("./bidHandler");
 const {moveHandler} = require("./moveHandler");
 const {ds_client} = require("./ds");
 const {watchAuction, unwatchAuction} = require("./watchHandler");
@@ -43,6 +43,9 @@ ds_client.on("messageCreate", async message => {
     switch (command) {
         case 'bid':
             await bidHandler(message, params);
+            break;
+        case 'ahtop':
+            await topBid(message);
             break;
         case 'watch':
             await watchAuction(message, params);
