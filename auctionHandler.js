@@ -210,7 +210,7 @@ const closeAuction = async function(auction_id) {
             if (bid) {
                 await deactivateAuction(auction_id)
                 await updateAuctionLastReminder(auction_id)
-                await sendToChannel(auction.channel_id, `This auction by <@${auction.auctioner_id}> has now ended. Final bid: ${bid.amount}. Congratulations to <@${bid.user_id}> for winning. <@${auction.admin_id}>, please confirm that taxes are paid if applicable.`);
+                await sendToChannel(auction.channel_id, `This auction by <@${auction.auctioner_id}> has now ended. Final bid: ${bid.amount}. Congratulations to <@${bid.user_id}> for winning. <@${auction.admin_id}>, please confirm that a tax of ${parseInt(bid.amount) * 0.05} is paid if applicable.`);
 
             }
         } else {
