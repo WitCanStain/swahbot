@@ -51,7 +51,7 @@ const auctionCheck = async function() {
         console.log(`end_time: ${end_time}`);
         if (end_time < Date.now()) {
             console.log(`Auction has ended, closing auction.`);
-            await closeAuction(auction.id);
+            await closeAuction(auction.id, message);
             // ds_client.channels.cache.get(auction.channel_id).send('This auction has ended.');
         }
     }

@@ -9,6 +9,7 @@ const getRoleByName = async function(message, role_name) {
 const sendToChannel = async function(channel_id, message) {
     try {
         console.log(`channel_id: ${channel_id}`)
+        console.log(`Sending message: ${message}`)
         return ds_client.channels.cache.get(channel_id).send(message);
     } catch (e) {
         console.error(e);

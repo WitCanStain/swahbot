@@ -204,10 +204,14 @@ const auctionPopulator = async function(message, params) {
 
 
 
-const closeAuction = async function(auction_id) {
+const closeAuction = async function(auction_id, message) {
     console.log(`Entered closeAuction().`);
     try {
         let auction = await getActiveAuctionById(auction_id);
+        let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah' && c.type === "GUILD_CATEGORY");
+        if (category) {
+            await message.channel.setParent(category.id);
+        }
         if (auction.high_bid) {
             let bid = await getBidById(parseInt(auction.high_bid));
             if (bid) {
