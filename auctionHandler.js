@@ -6,7 +6,7 @@ const {deactivateAuction, getBidById, getAuctionByChannelId, deactivateAuctionBy
     saveIncompleteAuction, populateAuctionField, setAuctionToActiveByChannelId, getIncompleteAuctionByChannelId,
     createAuction, updateAuctionLastReminder
 } = require("./db_utils");
-const {sendToChannel} = require("./ds_utils");
+const {sendToChannel, getChannelById} = require("./ds_utils");
 const {pool} = require("./db");
 
 
@@ -204,13 +204,17 @@ const auctionPopulator = async function(message, params) {
 
 
 
-const closeAuction = async function(auction_id, message) {
+const closeAuction = async function(auction_id, channel_id) {
     console.log(`Entered closeAuction().`);
     try {
         let auction = await getActiveAuctionById(auction_id);
-        let category = message.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah' && c.type === "GUILD_CATEGORY");
+        let channel = await getChannelById(channel_id);
+        let category;
+        if (channel) {
+            category = channel.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah' && c.type === "GUILD_CATEGORY");
+        }
         if (category) {
-            await message.channel.setParent(category.id);
+            await channel.setParent(category.id);
         }
         if (auction.high_bid) {
             let bid = await getBidById(parseInt(auction.high_bid));

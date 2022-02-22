@@ -5,6 +5,9 @@ const getRoleByName = async function(message, role_name) {
     return message.guild.roles.cache.find(role => role.name.toLowerCase() === role_name.toLowerCase());
 }
 
+const getChannelById = async function(channel_id) {
+    return ds_client.channels.fetch(channel_id);
+}
 
 const sendToChannel = async function(channel_id, message) {
     try {
@@ -29,3 +32,4 @@ const sendToUser = async function(user_id, message) {
 exports.getRoleByName = getRoleByName;
 exports.sendToChannel = sendToChannel;
 exports.sendToUser = sendToUser;
+exports.getChannelById = getChannelById;

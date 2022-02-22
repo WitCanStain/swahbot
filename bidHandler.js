@@ -38,7 +38,7 @@ const bidHandler = async function (message, params) {
             console.log(`auction: ${JSON.stringify(auction)}, ${bid.amount}`);
             if (auction.bin && bid.amount >= parseInt(auction.bin)) {
                 await sendToChannel(auction.channel_id, `<@${message.author.id}> has bid the BIN price and wins the auction.`);
-                await closeAuction(auction.id, message);
+                await closeAuction(auction.id, auction.channel_id);
                 watchers.forEach((watcher) => {
                     if (!(watcher === bid.user_id)) {
                         sendToUser(watcher, `Hey, I'm afraid somebody has bid the BIN price and won the auction for ${auction.item} in <#${auction.channel_id}> in the Stoneworks Auction House that you also bid in. Better luck next time.`);
