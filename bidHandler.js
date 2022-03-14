@@ -99,16 +99,22 @@ const retractBid = async function(message) {
         let auction;
         if (bid) {
             auction = await getAuctionByChannelId(bid.auction_id);
-            if (auction && (bid.id === auction.high_bid)) {
-                await deleteBidById(bid.id);
-                let high_bid = await getHighBidForAuction(auction.id);
-                if (high_bid) {
-                    await setHighBidForAuction(auction.id, high_bid.id);
+            console.log(`Auction: ${JSON.stringify(auction)}`);
+            if (auction) {
+                if (bid.id === auction.high_bid) {
+                    await deleteBidById(bid.id);
+                    let high_bid = await getHighBidForAuction(auction.id);
+                    if (high_bid) {
+                        await setHighBidForAuction(auction.id, high_bid.id);
+                    }
+                    message.reply(`Okay, I have deleted your bid. You can no longer bid in this auction.`);
+                } else {
+                    message.reply(`Your bid is not the top bid, not deleting bid.`);
                 }
-                message.reply(`Okay, I have deleted your bid. You can no longer bid in this auction.`);
             } else {
-                message.reply(`Your bid is not the top bid, not deleting bid.`);
+                console.log(`Auction ${message.channelId} not found.`)
             }
+
         } else {
             message.reply(`You have no bids in this auction.`);
         }

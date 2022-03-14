@@ -445,7 +445,7 @@ const getHighBidForAuction = async function(auction_id) {
     console.log(`Entered getHighBidForAuction().`);
     try {
         let bid = await pool.query(
-            "SELECT * FROM bids WHERE auction_id = $1 AND deleted=false ORDER BY created DESC LIMIT 1",
+            "SELECT * FROM bids WHERE auction_id = $1 AND deleted=false ORDER BY amount DESC LIMIT 1",
             [auction_id]
         );
         if (bid.rows.length === 0) {
