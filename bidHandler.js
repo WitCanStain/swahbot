@@ -2,7 +2,7 @@ const {validateBid, parseBid} = require("./validator");
 const {pool} = require("./db");
 const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, getBidById, getBidByUserId,
     getAuctionById, deleteBidById, getDeletedBidByUserIdAndAuctionId, getBidByUserIdAndChannelId, setHighBidForAuction,
-    getHighBidForAuction
+    getHighBidForAuction, getAuctionByChannelId
 } = require("./db_utils");
 const {closeAuction} = require("./auctionHandler");
 const {sendToUser, sendToChannel} = require("./ds_utils");
@@ -98,7 +98,7 @@ const retractBid = async function(message) {
         console.log(`Bid to retract: ${JSON.stringify(bid)}`)
         let auction;
         if (bid) {
-            auction = await getAuctionById(bid.auction_id);
+            auction = await getAuctionByChannelId(bid.auction_id);
             if (auction && (bid.id === auction.high_bid)) {
                 await deleteBidById(bid.id);
                 let high_bid = await getHighBidForAuction(auction.id);

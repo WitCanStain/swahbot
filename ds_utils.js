@@ -7,7 +7,8 @@ const getRoleByName = async function(message, role_name) {
 
 const getChannelById = async function(channel_id) {
     try {
-        return ds_client.channels.fetch(channel_id);
+        let channel = await ds_client.channels.fetch(channel_id);
+        return channel
     } catch (e) {
         console.error(e);
         return false;
