@@ -7,11 +7,11 @@ const watchAuction = async function(message, params) {
         let user_id = message.author.id;
         console.log(`user_id: ${user_id}`)
         let channel_id = message.channelId;
-        let bid = await getBidByUserIdAndChannelId(user_id, channel_id);
-        if (!bid) {
-            message.reply(`You have no bids in this auction.`);
-            return false;
-        }
+        // let bid = await getBidByUserIdAndChannelId(user_id, channel_id);
+        // if (!bid) {
+        //     message.reply(`You have no bids in this auction.`);
+        //     return false;
+        // }
         let res = await addWatcherToAuction(user_id, channel_id);
         if (res) {
             message.reply(`Okay, I will alert you when somebody outbids you.`)

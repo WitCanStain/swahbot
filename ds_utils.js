@@ -20,6 +20,17 @@ const sendToChannel = async function(channel_id, message) {
     }
 }
 
+const sendToChannelWithoutPing = async function(channel_id, message) {
+    try {
+        console.log(`channel_id: ${channel_id}`)
+        console.log(`Sending message without ping: ${message}`)
+        return ds_client.channels.cache.get(channel_id).send(message, {"allowedMentions": { "users" : []}});
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 const sendToUser = async function(user_id, message) {
     try {
         return ds_client.users.cache.get(user_id).send(message);
@@ -33,3 +44,4 @@ exports.getRoleByName = getRoleByName;
 exports.sendToChannel = sendToChannel;
 exports.sendToUser = sendToUser;
 exports.getChannelById = getChannelById;
+exports.sendToChannelWithoutPing = sendToChannelWithoutPing;

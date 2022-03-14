@@ -1,6 +1,6 @@
 const {isAdmin} = require("./validator");
-const {getRoleByName} = require("./ds_utils");
-const {getActiveAuctionByChannelId, setAdminForAuctionByChannelId} = require("./db_utils");
+const {getRoleByName, sendToChannel, sendToChannelWithoutPing} = require("./ds_utils");
+const {getActiveAuctionByChannelId, setAdminForAuctionByChannelId, getNumberOfSortedTicketsForAdmin} = require("./db_utils");
 
 
 const moveHandler = async function(message, params) {
@@ -28,6 +28,8 @@ const moveHandler = async function(message, params) {
             await channel.setPosition(0);
             await channel.lockPermissions();
             await setAdminForAuctionByChannelId(message.author.id, channel_id);
+            let tickets_sorted = await getNumberOfSortedTicketsForAdmin(message.author.id);
+            await sendToChannelWithoutPing(952861469031149588, `<@${message.author.id}> sorted ticket ${auction.item}-${channel.name.slice(-4)} and has now sorted ${tickets_sorted} tickets.`);
 
             if (ping) {
                 const role_name = getRoleNameFromCategoryName(category_name);

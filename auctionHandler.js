@@ -92,6 +92,8 @@ const ahHandler = async function(message, params) {
             let auction_id = await createAuction(auction);
             console.log(`Auction ${auction_id} has been created.`)
             let bin_string = parseInt(auction.bin) ? `\nBIN: ${auction.bin}`: '';
+            let deleted_messages = await message.channel.bulkDelete(100)
+            console.log(`Deleted ${deleted_messages.size} messages in ${message.channelId}`);
             await sendToChannel(auction.channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nSeller IGN: ${auction.ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.`)
         }
     } catch (e) {
@@ -122,9 +124,19 @@ const auctionPopulator = async function(message, params) {
             case '$ahstart':
                 let item = params.join(' ');
                 await populateAuctionField(channel_id, 'item', item);
-                message.reply(`Ok, this is what you are selling: ${item}. What is the duration of the auction? Type \`!ah [number of days]\`.`);
+                message.reply(`Ok, this is what you are selling: ${item}. What world are you selling it in? Type \`!ah [world]\`. Answer must be Rathnir, Eldham, or "both".`);
                 break;
             case 'item':
+                let world = params[0];
+                if (!['rathnir', 'eldham', 'both'].includes(world.toLowerCase())) {
+                    message.reply(`The answer must either be "Rathnir", "Eldham", or "Both"!`);
+                    return;
+                } else {
+                    await populateAuctionField(channel_id, 'world', parseInt(world.toLowerCase()));
+                    message.reply(`Ok, you're selling it in world: ${world}. What is the duration of the auction? Type \`!ah [number of days]\`.`)
+                }
+                break;
+            case 'world':
                 let duration = params[0];
                 if (isNaN(duration) || parseInt(duration) <= 0) {
                     message.reply(`Number of days must be a positive integer!`);
@@ -192,7 +204,9 @@ const auctionPopulator = async function(message, params) {
                 await populateAuctionField(channel_id, 'ign', ign);
                 await setAuctionToActiveByChannelId(channel_id);
                 let bin_string = parseInt(auction.bin) ? `\nBIN: ${auction.bin}`: '';
-                await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.\nYou may now start bidding by doing \`!bid [amount]\`, or BIN by doing \`!bid bin\`.`)
+                let deleted_messages = await message.channel.bulkDelete(100)
+                console.log(`Deleted ${deleted_messages.size} messages in ${channel_id}`);
+                await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nWorld: ${auction.world}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.\nYou may now start bidding by doing \`!bid [amount]\`, or BIN by doing \`!bid bin\`.`)
                 break;
         }
         return true;
@@ -215,6 +229,7 @@ const closeAuction = async function(auction_id, channel_id) {
         }
         if (category) {
             await channel.setParent(category.id);
+            await channel.setPosition(0);
         }
         if (auction.high_bid) {
             let bid = await getBidById(parseInt(auction.high_bid));

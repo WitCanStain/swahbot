@@ -1,6 +1,8 @@
 const {validateBid, parseBid} = require("./validator");
 const {pool} = require("./db");
-const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, getBidById} = require("./db_utils");
+const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, getBidById, getBidByUserId,
+    getAuctionById, deleteBidById, getDeletedBidByUserIdAndAuctionId, getBidByUserIdAndChannelId
+} = require("./db_utils");
 const {closeAuction} = require("./auctionHandler");
 const {sendToUser, sendToChannel} = require("./ds_utils");
 
@@ -13,6 +15,11 @@ const bidHandler = async function (message, params) {
             return false;
         }
         let auction = await getActiveAuctionByChannelId(message.channelId);
+        let deleted_bid = await getDeletedBidByUserIdAndAuctionId(message.author.id, auction.id);
+        if (deleted_bid) {
+            message.reply(`You have a deleted bid in this auction. You may no longer bid in this auction.`);
+            return;
+        }
         if (params[0].toLowerCase() === 'bin') {
             if (!auction.bin) {
                 message.reply(`This auction does not have a BIN price.`);
@@ -48,7 +55,7 @@ const bidHandler = async function (message, params) {
                 message.reply(`<@${message.author.id}> has the new high bid at ${bid.amount}.`);
                 watchers.forEach((watcher) => {
                     if (!(watcher === bid.user_id)) {
-                        sendToUser(watcher, `Hey, just letting you know that somebody outbid you in the Stoneworks Auction House for ${auction.item} in <#${auction.channel_id}>. New high bid is ${bid.amount}.`);
+                        sendToUser(watcher, `Hey, just letting you know that somebody has put a bid in the Stoneworks Auction House for ${auction.item} in <#${auction.channel_id}>. New high bid is ${bid.amount}.`);
                     }
                 })
             }
@@ -80,7 +87,30 @@ const topBid = async function(message) {
         console.error(e);
         return false;
     }
+}
 
+const retractBid = async function(message) {
+    console.log(`Entered retractiBid`);
+    try {
+        let user_id = message.author.id;
+        let bid = await getBidByUserIdAndChannelId(user_id, message.channelId);
+        let auction;
+        if (bid) {
+            auction = await getAuctionById(bid.auction_id);
+            if (auction && (bid.id === auction.high_bid)) {
+                await deleteBidById(bid.id);
+                message.reply(`Okay, I have deleted your bid. You can no longer bid in this auction.`);
+            } else {
+                message.reply(`Your bid is not the top bid, not deleting bid.`);
+            }
+        } else {
+            message.reply(`You have no bids in this auction.`);
+        }
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
 }
 
 
@@ -90,3 +120,4 @@ const topBid = async function(message) {
 exports.bidHandler = bidHandler;
 exports.parseBid = parseBid;
 exports.topBid = topBid;
+exports.retractBid = retractBid;

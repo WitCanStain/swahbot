@@ -35,6 +35,24 @@ const setAdminForAuctionByChannelId = async function(admin_id, channel_id) {
     }
 }
 
+const getNumberOfSortedTicketsForAdmin = async function(admin_id) {
+    console.log(`Entered getNumberOfSortedTicketsForAdmin().`);
+    try {
+        let response = await pool.query(
+            "SELECT COUNT (*) AS \"no_of_tickets\" FROM auctions WHERE admin_id=$1",
+            [admin_id]
+        );
+        if (response.rows.length > 0) {
+            return response.rows[0]["no_of_tickets"];
+        } else {
+            return "0";
+        }
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 const getIncompleteAuctionByChannelId = async function(channel_id) {
     console.log(`Entered getInactiveAuctionByChannelId().`);
     try {
@@ -154,6 +172,58 @@ const getBidById = async function(id) {
     }
 }
 
+const getDeletedBidByUserIdAndAuctionId = async function(user_id, auction_id) {
+    console.log(`Entered getDeletedBidByUserIdAndAuctionId().`);
+    try {
+        let res = await pool.query(
+            "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=true",
+            [user_id, auction_id]
+        );
+        const bid = res.rows;
+        if (bid.length > 0) {
+            return bid[0];
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error(e)
+        return false;
+    }
+}
+
+const getBidByUserId = async function(id) {
+    console.log(`Entered getBidById().`);
+    try {
+        let res = await pool.query(
+            "SELECT * FROM bids WHERE user_id=$1 AND deleted=false",
+            [id]
+        );
+        const bid = res.rows;
+        if (bid.length > 0) {
+            return bid[0];
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error(e)
+        return false;
+    }
+}
+
+const deleteBidById = async function(id) {
+    console.log(`Entered deleteBidById().`);
+    try {
+        let res = await pool.query(
+            "UPDATE bids SET deleted=true WHERE id=$1",
+            [id]
+        );
+        return true;
+    } catch (e) {
+        console.error(e)
+        return false;
+    }
+}
+
 const deactivateAuction = async function(id) {
     console.log(`Entered deactivateAuction().`);
     try {
@@ -234,7 +304,7 @@ const getBidByUserIdAndChannelId = async function(user_id, auction_id) {
     console.log(`Entered getBidByUserIdAndChannelId().`);
     try {
         let res = await pool.query(
-            "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=false",
+            "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=false ORDER BY created DESC",
             [user_id, auction_id]
         );
         const bid = res.rows;
@@ -375,3 +445,6 @@ exports.setAuctionToActiveByChannelId = setAuctionToActiveByChannelId;
 exports.getIncompleteAuctionByChannelId = getIncompleteAuctionByChannelId;
 exports.createAuction = createAuction;
 exports.setAdminForAuctionByChannelId = setAdminForAuctionByChannelId;
+exports.getNumberOfSortedTicketsForAdmin = getNumberOfSortedTicketsForAdmin;
+exports.deleteBidById = deleteBidById;
+exports.getDeletedBidByUserIdAndAuctionId = getDeletedBidByUserIdAndAuctionId;
