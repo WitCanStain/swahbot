@@ -227,8 +227,8 @@ const closeAuction = async function(auction_id, channel_id) {
         if (channel) {
             category = channel.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah' && c.type === "GUILD_CATEGORY");
         } else {
-            console.log(`Channel not found, likely the ticket was deleted without callin !ahclose. Deleting auction...`);
-            await deleteAuction(auction_id);
+            console.log(`Channel not found, likely the ticket was deleted without callin !ahclose.`);
+            // await deleteAuction(auction_id);
             return;
         }
         if (category) {
