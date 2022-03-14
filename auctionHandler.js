@@ -132,7 +132,7 @@ const auctionPopulator = async function(message, params) {
                     message.reply(`The answer must either be "Rathnir", "Eldham", or "Both"!`);
                     return;
                 } else {
-                    await populateAuctionField(channel_id, 'world', parseInt(world.toLowerCase()));
+                    await populateAuctionField(channel_id, 'world', world.toLowerCase());
                     message.reply(`Ok, you're selling it in world: ${world}. What is the duration of the auction? Type \`!ah [number of days]\`.`)
                 }
                 break;
