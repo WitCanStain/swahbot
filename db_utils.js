@@ -322,7 +322,7 @@ const getBidByUserIdAndChannelId = async function(user_id, auction_id) {
     console.log(`Entered getBidByUserIdAndChannelId().`);
     try {
         let res = await pool.query(
-            "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=false ORDER BY created DESC",
+            "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=false ORDER BY created DESC LIMIT 1",
             [user_id, auction_id]
         );
         const bid = res.rows;
@@ -441,6 +441,41 @@ const createAuction = async function(auction) {
     return res.rows[0].id;
 }
 
+const getHighBidForAuction = async function(auction_id) {
+    console.log(`Entered getHighBidForAuction().`);
+    try {
+        let bid = await pool.query(
+            "SELECT * FROM bids WHERE auction_id = $1 AND deleted=false ORDER BY created DESC LIMIT 1",
+            [auction_id]
+        );
+        if (bid.rows.length === 0) {
+            console.log(`High bid not found for channel ${auction_id}`);
+            return false;
+        } else {
+            bid = bid.rows[0];
+            return bid;
+        }
+    } catch (e) {
+        console.error(e)
+        return false;
+    }
+
+}
+
+const setHighBidForAuction = async function(auction_id, high_bid_id) {
+    console.log(`Entered setHighBidForAuction().`);
+    try {
+        let res = await pool.query(
+            "UPDATE auctions SET high_bid=$1 WHERE id=$2",
+            [high_bid_id, auction_id]
+        )
+        return true;
+    } catch (e) {
+        console.error(e)
+        return false;
+    }
+}
+
 
 exports.getAuctionByChannelId = getAuctionByChannelId;
 exports.getBidById = getBidById;
@@ -466,3 +501,5 @@ exports.setAdminForAuctionByChannelId = setAdminForAuctionByChannelId;
 exports.getNumberOfSortedTicketsForAdmin = getNumberOfSortedTicketsForAdmin;
 exports.deleteBidById = deleteBidById;
 exports.getDeletedBidByUserIdAndAuctionId = getDeletedBidByUserIdAndAuctionId;
+exports.getHighBidForAuction = getHighBidForAuction;
+exports.setHighBidForAuction = setHighBidForAuction;

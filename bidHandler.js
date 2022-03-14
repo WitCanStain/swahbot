@@ -1,7 +1,8 @@
 const {validateBid, parseBid} = require("./validator");
 const {pool} = require("./db");
 const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, getBidById, getBidByUserId,
-    getAuctionById, deleteBidById, getDeletedBidByUserIdAndAuctionId, getBidByUserIdAndChannelId
+    getAuctionById, deleteBidById, getDeletedBidByUserIdAndAuctionId, getBidByUserIdAndChannelId, setHighBidForAuction,
+    getHighBidForAuction
 } = require("./db_utils");
 const {closeAuction} = require("./auctionHandler");
 const {sendToUser, sendToChannel} = require("./ds_utils");
@@ -90,15 +91,20 @@ const topBid = async function(message) {
 }
 
 const retractBid = async function(message) {
-    console.log(`Entered retractiBid`);
+    console.log(`Entered retractBid()`);
     try {
         let user_id = message.author.id;
         let bid = await getBidByUserIdAndChannelId(user_id, message.channelId);
+        console.log(`Bid to retract: ${JSON.stringify(bid)}`)
         let auction;
         if (bid) {
             auction = await getAuctionById(bid.auction_id);
             if (auction && (bid.id === auction.high_bid)) {
                 await deleteBidById(bid.id);
+                let high_bid = await getHighBidForAuction(auction.id);
+                if (high_bid) {
+                    await setHighBidForAuction(auction.id, high_bid.id);
+                }
                 message.reply(`Okay, I have deleted your bid. You can no longer bid in this auction.`);
             } else {
                 message.reply(`Your bid is not the top bid, not deleting bid.`);
