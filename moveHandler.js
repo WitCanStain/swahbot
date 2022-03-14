@@ -29,13 +29,13 @@ const moveHandler = async function(message, params) {
             await channel.lockPermissions();
             await setAdminForAuctionByChannelId(message.author.id, channel_id);
             let tickets_sorted = await getNumberOfSortedTicketsForAdmin(message.author.id);
+            let auction = await getActiveAuctionByChannelId(channel_id);
             await sendToChannelWithoutPing(952861469031149588, `<@${message.author.id}> sorted ticket ${auction.item}-${channel.name.slice(-4)} and has now sorted ${tickets_sorted} tickets.`);
 
             if (ping) {
                 const role_name = getRoleNameFromCategoryName(category_name);
                 if (role_name) {
                     let role = await getRoleByName(message, role_name);
-                    let auction = await getActiveAuctionByChannelId(channel_id);
                     await message.channel.setName(`${auction.item}-${channel.name.slice(-4)}`)
                         .catch(console.error);
                     channel.send(`<@&${role.id}>: A new auction has opened.`);
