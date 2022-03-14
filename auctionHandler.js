@@ -228,6 +228,14 @@ const closeAuction = async function(auction_id, channel_id) {
             category = channel.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah' && c.type === "GUILD_CATEGORY");
         }
         if (category) {
+            let channel_count = category.children.size;
+            if (channel_count >= 48) {
+                category = channel.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah 2' && c.type === "GUILD_CATEGORY");
+            }
+            channel_count = category.children.size;
+            if (channel_count >= 48) {
+                category = channel.guild.channels.cache.find(c => c.name.toLowerCase() === 'finished ah 3' && c.type === "GUILD_CATEGORY");
+            }
             await channel.setParent(category.id);
             await channel.setPosition(0);
         }
