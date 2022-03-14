@@ -53,6 +53,24 @@ const getNumberOfSortedTicketsForAdmin = async function(admin_id) {
     }
 }
 
+const getNumberOfClosedTicketsForAdmin = async function(admin_id) {
+    console.log(`Entered getNumberOfSortedTicketsForAdmin().`);
+    try {
+        let response = await pool.query(
+            "SELECT COUNT (*) AS \"no_of_closed_tickets\" FROM auctions WHERE admin_id=$1",
+            [admin_id]
+        );
+        if (response.rows.length > 0) {
+            return response.rows[0]["no_of_closed_tickets"];
+        } else {
+            return "0";
+        }
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 const getIncompleteAuctionByChannelId = async function(channel_id) {
     console.log(`Entered getInactiveAuctionByChannelId().`);
     try {

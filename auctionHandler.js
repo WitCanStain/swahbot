@@ -6,7 +6,7 @@ const {deactivateAuction, getBidById, getAuctionByChannelId, deactivateAuctionBy
     saveIncompleteAuction, populateAuctionField, setAuctionToActiveByChannelId, getIncompleteAuctionByChannelId,
     createAuction, updateAuctionLastReminder
 } = require("./db_utils");
-const {sendToChannel, getChannelById} = require("./ds_utils");
+const {sendToChannel, getChannelById, sendToChannelWithoutPing} = require("./ds_utils");
 const {pool} = require("./db");
 
 
@@ -267,6 +267,7 @@ const completeAuction = async function(message) {
         }
         return finaliseAuction(auction.id).then((res) => {
             sendToChannel(channel_id, `This auction has been closed.`);
+            sendToChannelWithoutPing("952861469031149588", `<@${message.author.id}> has closed ticket ${auction.item}, true auction id ${auction.id}.`);
         });
     } catch (e) {
         console.error(e);
