@@ -206,7 +206,8 @@ const auctionPopulator = async function(message, params) {
                 let bin_string = parseInt(auction.bin) ? `\nBIN: ${auction.bin}`: '';
                 let deleted_messages = await message.channel.bulkDelete(100)
                 console.log(`Deleted ${deleted_messages.size} messages in ${channel_id}`);
-                await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nWorld: ${auction.world}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.\nYou may now start bidding by doing \`!bid [amount]\`, or BIN by doing \`!bid bin\`.`)
+                let msg = await sendToChannel(channel_id, `An auction has been created with the following details:\`\`\`\nItem: ${auction.item}\nWorld: ${auction.world}\nSeller IGN: ${ign}\nStarting bid: ${auction.initial_bid}${bin_string}\nMinimum bid: ${auction.minimum_bid}\nDuration: ${auction.duration}\nThis auction will end ${formatDistance(Date.now() + auction.duration * process.env.DAY_MSECONDS, Date.now(), {addSuffix: true})}\`\`\`\nIf you are selling a lored or enchanted item, please provide screenshots below. I will ping you, the winner, and the responsible admin when the auction has ended.\nYou may now start bidding by doing \`!bid [amount]\`, or BIN by doing \`!bid bin\`.`)
+                msg.pin();
                 break;
         }
         return true;
