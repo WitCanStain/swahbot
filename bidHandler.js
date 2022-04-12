@@ -6,6 +6,7 @@ const {getAuctionWatchersFromAuctionId, getActiveAuctionByChannelId, createBid, 
 } = require("./db_utils");
 const {closeAuction} = require("./auctionHandler");
 const {sendToUser, sendToChannel} = require("./ds_utils");
+const { hi } = require("date-fns/locale");
 
 
 const bidHandler = async function (message, params) {
@@ -16,10 +17,10 @@ const bidHandler = async function (message, params) {
             return false;
         }
         let auction = await getActiveAuctionByChannelId(message.channelId);
-        let deleted_bid = await getDeletedBidByUserIdAndAuctionId(message.author.id, auction.id);
+        let deleted_bid = await getDeletedBidByUserIdAndAuctionId(message.author.id, auction.channel_id);
         if (deleted_bid) {
             message.reply(`You have a deleted bid in this auction. You may no longer bid in this auction.`);
-            return;
+            return false;
         }
         if (params[0].toLowerCase() === 'bin') {
             if (!auction.bin) {
@@ -101,11 +102,12 @@ const retractBid = async function(message) {
             auction = await getAuctionByChannelId(bid.auction_id);
             console.log(`Auction: ${JSON.stringify(auction)}`);
             if (auction) {
-                if (bid.id === auction.high_bid) {
+                if (parseInt(bid.id) === parseInt(auction.high_bid)) {
                     await deleteBidById(bid.id);
-                    let high_bid = await getHighBidForAuction(auction.id);
+                    let high_bid = await getHighBidForAuction(auction.channel_id);
+                    console.log(`retrieved high bid: ${JSON.stringify(high_bid)}`)
                     if (high_bid) {
-                        await setHighBidForAuction(auction.id, high_bid.id);
+                        await setHighBidForAuction(auction.channel_id, high_bid.id);
                     }
                     message.reply(`Okay, I have deleted your bid. You can no longer bid in this auction.`);
                 } else {

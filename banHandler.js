@@ -57,7 +57,7 @@ async function banHandler(message, params) {
                 if (previous_ban) {
                     message.reply(`User ${ban.user_name} was already banned for ${formatDistance( previous_ban.created + previous_ban.duration, Date.now())}. The ban has been extended to ${formatDistance(parseInt( Date.now() + ban.duration), Date.now())}.`)
                 } else {
-                    message.reply(`User ${ban.user_name} has been banned for ${formatDistance( Date.now() + ban.duration, Date.now())}.`)
+                    message.reply(`User ${ban.user_name} has been banned.`)
                 }
 
             }

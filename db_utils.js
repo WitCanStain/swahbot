@@ -191,13 +191,14 @@ const getBidById = async function(id) {
 }
 
 const getDeletedBidByUserIdAndAuctionId = async function(user_id, auction_id) {
-    console.log(`Entered getDeletedBidByUserIdAndAuctionId().`);
+    console.log(`Entered getDeletedBidByUserIdAndAuctionId(${user_id}, ${auction_id}).`);
     try {
         let res = await pool.query(
             "SELECT * FROM bids WHERE user_id=$1 AND auction_id=$2 AND deleted=true",
             [user_id, auction_id]
         );
         const bid = res.rows;
+        console.log(`deleted bid: ${JSON.stringify(bid)}`)
         if (bid.length > 0) {
             return bid[0];
         } else {
@@ -462,12 +463,12 @@ const getHighBidForAuction = async function(auction_id) {
 
 }
 
-const setHighBidForAuction = async function(auction_id, high_bid_id) {
+const setHighBidForAuction = async function(auction_channel_id, high_bid_id) {
     console.log(`Entered setHighBidForAuction().`);
     try {
         let res = await pool.query(
-            "UPDATE auctions SET high_bid=$1 WHERE id=$2",
-            [high_bid_id, auction_id]
+            "UPDATE auctions SET high_bid=$1 WHERE channel_id=$2",
+            [high_bid_id, auction_channel_id]
         )
         return true;
     } catch (e) {
