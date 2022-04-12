@@ -4,10 +4,11 @@ const {formatDistance} = require("date-fns");
 const {deactivateAuction, getBidById, getAuctionByChannelId, deactivateAuctionByChannelId, getAuctionById,
     finaliseAuction, getActiveAuctionByChannelId, getUnfinalisedAuctionByChannelId, deleteAuction, getActiveAuctionById,
     saveIncompleteAuction, populateAuctionField, setAuctionToActiveByChannelId, getIncompleteAuctionByChannelId,
-    createAuction, updateAuctionLastReminder
+    createAuction, updateAuctionLastReminder, getBidsByChannelId
 } = require("./db_utils");
 const {sendToChannel, getChannelById, sendToChannelWithoutPing} = require("./ds_utils");
 const {pool} = require("./db");
+const { GuildAuditLogsEntry } = require("discord.js");
 
 
 const ahHandler = async function(message, params) {
@@ -321,9 +322,67 @@ const cancelAuction = async function(message) {
     }
 }
 
+const changeAuction = async function(message, params) {
+    if (params.length <1) {
+        console.log(`Must provide an argument to the command.`)
+        message.reply(`Must provide an argument to the command.`)
+        return false;
+    }
+    let args = params[0].split('=');
+    let field =  args[0].toLowerCase();
+    let value = args[1];
+
+    let auction = await getActiveAuctionByChannelId(message.channelId);
+    if (!auction) {
+        message.reply(`No active auction found in this channel.`);
+        return false;
+    } else if (auction.auctioner_id != message.author.id) {
+        message.reply(`This is not your auction bozo XD`);
+        return false;
+    }
+
+    if (field === 'bin') {
+        if (!auction.bin) {
+            
+            let bids = await getBidsByChannelId(auction.channel_id);
+            if (bids) {
+                message.reply('Cannot change the BIN if bids already exist.')
+                return false;
+            }
+            let new_bin = parseBid(value)
+            if (new_bin) {
+                if(parseInt(auction.initial_bid) >= parseInt(new_bin)) {
+                    message.reply(`BIN cannot be lower than the initial bid.`)
+                    return false;
+                }
+                let res = await populateAuctionField(auction.channel_id, field, new_bin, true)
+                if (res) {
+                    message.reply(`Changed the BIN to ${new_bin}`)
+                    return true;
+                } else {
+                    message.reply(`Something went wrong x.x`)
+                    return false;
+                }
+            } else {
+                message.reply(`Improper value.`)
+            }
+            
+        } else {
+            message.reply('Cannot change the BIN once it has been set.');
+            return false;
+        }
+    } else {
+        message.reply(`Changing this field is not currently supported.`)
+        return false;
+    }
+    return true;
+
+}
+
 
 exports.ahHandler = ahHandler;
 exports.closeAuction = closeAuction;
 exports.cancelAuction = cancelAuction;
 exports.completeAuction = completeAuction;
 exports.auctionPopulator = auctionPopulator;
+exports.changeAuction = changeAuction;

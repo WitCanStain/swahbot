@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const {inspect} = require('util');
 const {banHandler, unbanHandler} = require('./banHandler');
-const {ahHandler, cancelAuction, completeAuction, auctionPopulator} = require("./auctionHandler");
+const {ahHandler, cancelAuction, completeAuction, auctionPopulator, changeAuction} = require("./auctionHandler");
 const {bidHandler, topBid, retractBid} = require("./bidHandler");
 const {moveHandler} = require("./moveHandler");
 const {ds_client} = require("./ds");
@@ -58,6 +58,9 @@ ds_client.on("messageCreate", async message => {
             break;
         case 'ahcreate':
             await ahHandler(message, params);
+            break;
+        case 'ahchange':
+            await changeAuction(message, params);
             break;
         case 'ah':
             await auctionPopulator(message, params);

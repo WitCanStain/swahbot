@@ -190,6 +190,25 @@ const getBidById = async function(id) {
     }
 }
 
+const getBidsByChannelId = async function(channel_id) {
+    console.log(`Entered getBidsByChannelId(${channel_id})`);
+    try {
+        let res = await pool.query(
+            "SELECT * FROM bids WHERE auction_id=$1 AND deleted=false",
+            [channel_id]
+        );
+        res = res.rows;
+        if (res.length > 0) {
+            return res;
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 const getDeletedBidByUserIdAndAuctionId = async function(user_id, auction_id) {
     console.log(`Entered getDeletedBidByUserIdAndAuctionId(${user_id}, ${auction_id}).`);
     try {
@@ -373,13 +392,21 @@ const saveIncompleteAuction = async function(message) {
     }
 }
 
-const populateAuctionField = async function(channel_id, column, value) {
-    console.log(`Entered saveIncompleteAuction().`);
+const populateAuctionField = async function(channel_id, column, value, completed=false) {
+    console.log(`Entered populateAuctionField().`);
     try {
-        await pool.query(
-            `UPDATE auctions SET ${column}=$2, last_filled_field=$1 WHERE channel_id=$3 AND deleted=FALSE AND active=FALSE`,
-            [column, value, channel_id]
-        )
+        if (!completed) {
+            await pool.query(
+                `UPDATE auctions SET ${column}=$2, last_filled_field=$1 WHERE channel_id=$3 AND deleted=FALSE AND active=FALSE`,
+                [column, value, channel_id]
+            )
+        } else {
+            await pool.query(
+                `UPDATE auctions SET ${column}=$1 WHERE channel_id=$2 AND deleted=FALSE`,
+                [value, channel_id]
+            )
+        }
+        
         return true;
     } catch (e) {
         console.error(e);
@@ -504,3 +531,4 @@ exports.deleteBidById = deleteBidById;
 exports.getDeletedBidByUserIdAndAuctionId = getDeletedBidByUserIdAndAuctionId;
 exports.getHighBidForAuction = getHighBidForAuction;
 exports.setHighBidForAuction = setHighBidForAuction;
+exports.getBidsByChannelId = getBidsByChannelId;
