@@ -371,6 +371,33 @@ const changeAuction = async function(message, params) {
             message.reply('Cannot change the BIN once it has been set.');
             return false;
         }
+    } else if (field === 'initial_bid'){
+        let bids = await getBidsByChannelId(auction.channel_id);
+        if (bids) {
+            message.reply('Cannot change the initial bid if bids already exist.')
+            return false;
+        }
+        let new_initial_bid = parseBid(value);
+        if (new_initial_bid) {
+            console.log(`auction bin: ${auction.bin}`)
+            console.log(`new initial bid: ${new_initial_bid}`)
+            if (auction.bin && parseInt(new_initial_bid) >= parseInt(auction.bin)) {
+                message.reply(`New initial bid cannot be higher than the BIN.`);
+                return false;
+            }
+            let res = await populateAuctionField(auction.channel_id, field, new_initial_bid, true)
+            if (res) {
+                message.reply(`Changed the initial bid to ${new_initial_bid}`)
+                return true;
+            } else {
+                message.reply(`Something went wrong x.x`)
+                return false;
+            }
+        } else {
+            message.reply(`Improper value.`);
+            
+
+        }
     } else {
         message.reply(`Changing this field is not currently supported.`)
         return false;
