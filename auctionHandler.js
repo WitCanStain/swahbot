@@ -281,7 +281,7 @@ const completeAuction = async function(message) {
         }
         return finaliseAuction(auction.id).then((res) => {
             sendToChannel(channel_id, `This auction has been closed.`);
-            sendToChannelWithoutPing("952861469031149588", `<@${message.author.id}> has closed ticket ${auction.item}, true auction id ${auction.id}.`);
+            sendToChannelWithoutPing("1000034311384346674", `<@${message.author.id}> has closed ticket ${auction.item}, true auction id ${auction.id}.`);
         });
     } catch (e) {
         console.error(e);

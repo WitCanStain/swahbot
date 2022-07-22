@@ -31,7 +31,7 @@ const moveHandler = async function(message, params) {
             let tickets_sorted = await getNumberOfSortedTicketsForAdmin(message.author.id);
             let auction = await getActiveAuctionByChannelId(channel_id);
             let auction_name = `${auction.item}-${channel.name.slice(-4)}`
-            await sendToChannelWithoutPing("952861469031149588", `<@${message.author.id}> sorted ticket ${auction_name} and has now sorted ${tickets_sorted} tickets.`);
+            await sendToChannelWithoutPing("1000034311384346674", `<@${message.author.id}> sorted ticket ${auction_name} and has now sorted ${tickets_sorted} tickets.`);
 
             if (ping) {
                 const role_name = getRoleNameFromCategoryName(category_name);
